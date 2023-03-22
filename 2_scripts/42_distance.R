@@ -25,7 +25,8 @@ data.frame(row.names = c("A", "B", "C"),
 
 # hamming distance
 library(e1071)
-e1071::hamming.distance(as.matrix(test_df))/ncol(test_df)
+e1071::hamming.distance(as.matrix(test_df)) # hamming dist
+e1071::hamming.distance(as.matrix(test_df))/ncol(test_df) # effectively gower dist
 
 # gower distance
 vegan::vegdist(x = test_df,
@@ -285,27 +286,97 @@ for(current_class_index in c("Outlines", "Tools", "Technology")){ #  "Outlines",
   
 }
 
-cophenet_TaxUnit_df_list_datatype_df <- do.call(rbind.data.frame, cophenet_TaxUnit_df_list_datatype)
+cophenet_TaxUnit_df_list_datatype_df <- 
+  do.call(rbind.data.frame, cophenet_TaxUnit_df_list_datatype)
 cophenet_TaxUnit_df_list_datatype_df
 
-pairwise_meandistances_within_df_list_datatype_df <- do.call(rbind.data.frame, pairwise_meandistances_within_df_list_datatype) %>% 
-  dplyr::left_join(., taxgroups_fac_hexcodes,
-                   by = c("semantic_group" = "higher_order"))
-pairwise_meandistances_NULL_df_list_datatype_df <- do.call(rbind.data.frame, pairwise_meandistances_NULL_df_list_datatype) %>% 
+pairwise_meandistances_within_df_list_datatype_df <- 
+  do.call(rbind.data.frame, pairwise_meandistances_within_df_list_datatype) %>% 
   dplyr::left_join(., taxgroups_fac_hexcodes,
                    by = c("semantic_group" = "higher_order"))
 
-cophenet_TaxUnit_df_list_datatype_df$SES <- paste0("SES = ", cophenet_TaxUnit_df_list_datatype_df$std_effect_size)
+pairwise_meandistances_NULL_df_list_datatype_df <- 
+  do.call(rbind.data.frame, pairwise_meandistances_NULL_df_list_datatype) %>% 
+  dplyr::left_join(., taxgroups_fac_hexcodes,
+                   by = c("semantic_group" = "higher_order"))
+
+cophenet_TaxUnit_df_list_datatype_df$SES <- 
+  paste0("SES = ", cophenet_TaxUnit_df_list_datatype_df$std_effect_size)
+
+
+
+
+# save SES results
+readr::write_csv(x = cophenet_TaxUnit_df_list_datatype_df,
+                 file = file.path(output_path, "42_distance_SES.csv"))
+
+saveRDS(list(Null = pairwise_meandistances_NULL_df_list_datatype_df,
+             Within = pairwise_meandistances_within_df_list_datatype_df),
+        file = file.path(output_path, "42_distance_SES.RDS"))
+
+
+# # load SES results in case R crashes when plotting
+# cophenet_TaxUnit_df_list_datatype_df <- readr::read_csv(file = file.path(output_path, "42_distance_SES.csv"))
+# 
+# SES_RDS <- readRDS(file.path(output_path, "42_distance_SES.RDS"))
+# pairwise_meandistances_NULL_df_list_datatype_df <- SES_RDS$Null
+# pairwise_meandistances_within_df_list_datatype_df <- SES_RDS$Within
+# rm("SES_RDS") # remove SES_RDS to make space
+# gc()
+# gc()
+
+# plot SES results
+
+## remove not classified entries
+pairwise_meandistances_NULL_df_list_datatype_df <- 
+  subset(pairwise_meandistances_NULL_df_list_datatype_df,
+         !(semantic_group %in% "Not classified"))
+
+pairwise_meandistances_within_df_list_datatype_df <- 
+subset(pairwise_meandistances_within_df_list_datatype_df,
+       !(semantic_group %in% "Not classified"))
+
+cophenet_TaxUnit_df_list_datatype_df_NO_notClassified <- 
+  subset(cophenet_TaxUnit_df_list_datatype_df, 
+         !(semantic_group %in% "Not classified"))
+
+
+## set factor
+pairwise_meandistances_within_df_list_datatype_df$semantic_group <- 
+  factor(pairwise_meandistances_within_df_list_datatype_df$semantic_group,
+         levels = unique(pairwise_meandistances_within_df_list_datatype_df$semantic_group[order(pairwise_meandistances_within_df_list_datatype_df$chrono_order)]),
+         ordered = T)
+pairwise_meandistances_within_df_list_datatype_df$class <- 
+  factor(pairwise_meandistances_within_df_list_datatype_df$class,
+         levels = c("Tools", "Technology", "Outlines"))
+
+pairwise_meandistances_NULL_df_list_datatype_df$semantic_group <- 
+  factor(pairwise_meandistances_NULL_df_list_datatype_df$semantic_group,
+         levels = unique(pairwise_meandistances_NULL_df_list_datatype_df$semantic_group[order(pairwise_meandistances_NULL_df_list_datatype_df$chrono_order)]),
+         ordered = T)
+pairwise_meandistances_NULL_df_list_datatype_df$class <- 
+  factor(pairwise_meandistances_NULL_df_list_datatype_df$class,
+         levels = c("Tools", "Technology", "Outlines"))
+
+cophenet_TaxUnit_df_list_datatype_df_NO_notClassified$semantic_group <- 
+  factor(cophenet_TaxUnit_df_list_datatype_df_NO_notClassified$semantic_group,
+         levels = unique(pairwise_meandistances_NULL_df_list_datatype_df$semantic_group[order(pairwise_meandistances_NULL_df_list_datatype_df$chrono_order)]),
+         ordered = T)
+cophenet_TaxUnit_df_list_datatype_df_NO_notClassified$class <- 
+  factor(cophenet_TaxUnit_df_list_datatype_df_NO_notClassified$class,
+         levels = c("Tools", "Technology", "Outlines"))
+
 
 library(ggplot2)
-ggplot() +
+SES_plot <-
+  ggplot() +
   geom_histogram(data = pairwise_meandistances_NULL_df_list_datatype_df,
                  aes(x = mean_distance)) +
   geom_vline(data = pairwise_meandistances_within_df_list_datatype_df,
              aes(xintercept = mean_distance,
                  color = semantic_group),
              size = 2) +
-  geom_label(data = cophenet_TaxUnit_df_list_datatype_df,
+  geom_label(data = cophenet_TaxUnit_df_list_datatype_df_NO_notClassified,
              mapping = aes(x = Inf, 
                            y = Inf, 
                            label = SES),
@@ -320,17 +391,18 @@ ggplot() +
   scale_color_manual(values = higher_order_hexcodes_manual) +
   # guides(color = guide_legend("Semantic group")) +
   theme(legend.position="none")
+SES_plot
 
+SES_plot_width <- 18
+SES_plot_height <- 10
+ggsave(plot = SES_plot,
+       filename = file.path(output_path, "Fig_4_SES_plot.png"),
+       width = SES_plot_width,
+       height = SES_plot_height)
 
-
-readr::write_csv(x = cophenet_TaxUnit_df_list_datatype_df,
-                 file = file.path(output_path, "42_distance_SES.csv"))
-
-saveRDS(list(Null = pairwise_meandistances_NULL_df_list_datatype_df,
-             Within = pairwise_meandistances_within_df_list_datatype_df),
-        file = file.path(output_path, "42_distance_SES.RDS"))
-
-
+svg(filename = file.path(output_path, "Fig_4_SES_plot.svg"),width =SES_plot_width, height = SES_plot_height)
+SES_plot
+dev.off()
 
 ##################################### 
 # bootstrapped dendrograms
