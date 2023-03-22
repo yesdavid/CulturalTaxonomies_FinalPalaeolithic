@@ -1,0 +1,95 @@
+"TaxUnit","raw_name","TaxUnit_unique","higher_order","core_group","chrono_order"
+"Late Palaeolithic","Late Palaeolithic","LPal_SG","Not classified","TRUE",8
+"Late Palaeolithic generic","Late Palaeolithic","LPal_ASH","Not classified","TRUE",8
+"Early Sauveterrian (Phase 4)","Sauveterrian","ESauv_NEI","Mesolithic","FALSE",7
+"Early Sauveterrian","Sauveterrian","ESauv_NEI","Mesolithic","FALSE",7
+"Sauveterrian/Sauveterroid","Sauveterrian","Sauv_IBM","Mesolithic","FALSE",7
+"Beuronian A ","Beuronian","BeurA_SG","Mesolithic","FALSE",7
+"Early Mesolithic","Generic Mesolithic","EMeso_GBS","Mesolithic","TRUE",7
+"Early Mesolithic I","Generic Mesolithic","EMeso_CH","Mesolithic","TRUE",7
+"Maglemose","Maglemose","Magle_NG","Mesolithic","FALSE",7
+"Maglemose","Maglemose","Magle_SS","Mesolithic","FALSE",7
+"Mesolithic","Generic Mesolithic","Meso_BOMO","Mesolithic","TRUE",7
+"Creswellian/Late Magdalenian","Cresswellian","Cres_GBS","Magdalenian","FALSE",1
+"Creswellian/Late Magdalenian","Cresswellian","Cres_GBS","Magdalenian","FALSE",1
+"Epimagdalenian","Epimagdalenian","EpiMag_BOMO","Magdalenian","TRUE",1
+"Epipaleolithic/Epimagdalenian ","Epimagdalenian","EMag_IBM","Magdalenian","TRUE",1
+"Final Magdalenian","Magdalenian","FMag_IBM","Magdalenian","TRUE",1
+"Final Magdalenian","Magdalenian","Fmag_IBC","Magdalenian","TRUE",1
+"Final Magdalenian","Magdalenian","FMag_IBC","Magdalenian","TRUE",1
+"Final Magdalenian","Magdalenian","FMag_IBA","Magdalenian","TRUE",1
+"Hamburgian","Hamburgian","Ham_LT","Magdalenian","FALSE",1
+"Hamburgian","Hamburgian","Ham_NG","Magdalenian","FALSE",1
+"Hamburgian","Hamburgian","Ham_PL","Magdalenian","FALSE",1
+"Havelte","Havelte","Ham_SS","Magdalenian","FALSE",1
+"Havelte","Havelte","Hav_GBS","Magdalenian","FALSE",1
+"Havelte ","Havelte","Hav_NG","Magdalenian","FALSE",1
+"Kamienna variant","Kamienna","Kam_PL","Magdalenian","FALSE",1
+"Late Magdalenian","Magdalenian","LMag_ASH","Magdalenian","TRUE",1
+"Late Magdalenian/Technokomplex E","Magdalenian","LMagTKE_CH","Magdalenian","TRUE",1
+"Late/Transitional Magdalenian","Magdalenian","TransMag_SG","Magdalenian","TRUE",1
+"Magdalenian","Magdalenian","Mag_BSN","Magdalenian","TRUE",1
+"Magdalenian","Magdalenian","Mag_BOMO","Magdalenian","TRUE",1
+"Magdalenian","Magdalenian","Mag_BOMO","Magdalenian","TRUE",1
+"Magdalenian","Magdalenian","Mag_PL","Magdalenian","TRUE",1
+"Upper Magdalenian","Magdalenian","UMag_SWF","Magdalenian","TRUE",1
+"Upper Magdalenian","Magdalenian","UMag_IBA","Magdalenian","TRUE",1
+"Upper Magdalenian","Magdalenian","FMag_IBM","Magdalenian","TRUE",1
+"Upper Magdalenian","Magdalenian","UMag_NF","Magdalenian","TRUE",1
+"Płudian","Pludian","Plu_PL","TPC","TRUE",5
+"Brommean","Bromme","Brom_PL","TPC","TRUE",5
+"Bromme","Bromme","Brom_PL","TPC","TRUE",5
+"Brommean","Bromme","Brom_LT","TPC","TRUE",5
+"Brommean","Bromme","Brom_NG","TPC","TRUE",5
+"Brommean","Bromme","Brom_SS","TPC","TRUE",5
+"Perstunian","Perstunian","Perst_PL","TPC","TRUE",5
+"Ahrensburgian","Ahrensburgian","Ahr_LT","TPC","TRUE",5
+"Ahrensburgian","Ahrensburgian","Ahr_NG","TPC","TRUE",5
+"Ahrensburgian","Ahrensburgian","Ahr_SS","TPC","TRUE",5
+"Swiderian","Swiderian","Swid_LT","TPC","TRUE",5
+"Swiderian","Swiderian","Swid_PL","TPC","TRUE",5
+"Swiderian-Ahrensburgian","Swiderian-Ahrensburgian","SwidAhr_PL","TPC","TRUE",5
+"Swiderian-Ahrensburgian","Swiderian-Ahrensburgian","SwidAhr_PL","TPC","TRUE",5
+"Wołkuszian","Wolkuszian","Wolk_PL","TPC","TRUE",5
+"Belloisian","Belloisian","Bell_NF","FBT/LBI","TRUE",6
+"Early Laborian","Laborian","ELab_SWF","FBT/LBI","TRUE",6
+"Epi-Ahrensburgian","Epiahrensburgian","EpiAhr_BSN","FBT/LBI","TRUE",6
+"Epi-Ahrensburgian","Epiahrensburgian","EpiAhr_BSN","FBT/LBI","TRUE",6
+"Epi-Ahrensburgian","Epiahrensburgian","EpiAhr_PL","FBT/LBI","TRUE",6
+"Late Laborian","Laborian","LLab_SWF","FBT/LBI","TRUE",6
+"Long Blade Industries/Epi-Ahrensburgian (FBT)","Epiahrensburgian","FBBT_GBS","FBT/LBI","TRUE",6
+"Long Blade Industries/Epi-Ahrensburgian (FBT)","Epiahrensburgian","FBBT_GBS","FBT/LBI","TRUE",6
+"Epigravettiano recente","Epigravettian","REpigrav_ASH","Epigravettian","TRUE",2
+"Late Epigravettian","Epigravettian","LEpigrav_ASH","Epigravettian","TRUE",2
+"Late Epigravettian (Phase 2)","Epigravettian","LEpigrav_NEI","Epigravettian","TRUE",2
+"Late Epigravettian (Phase 3)","Epigravettian","LEpigrav_NEI","Epigravettian","TRUE",2
+"Late Epigravettian (Phase 4)/Early Sauveterrian","Sauveterrian","LEpigravESauv_NEI","Epigravettian","TRUE",2
+"Azilian","Azilian","EMag_IBM","ABP/Azilian","TRUE",3
+"Azilian","Azilian","EAzil_IBC","ABP/Azilian","TRUE",3
+"Azilian","Azilian","EAzil_IBA","ABP/Azilian","TRUE",3
+"Azilian","Azilian","LAzil_IBA","ABP/Azilian","TRUE",3
+"Azilian ","Azilian","LAzil_IBC","ABP/Azilian","TRUE",3
+"Azilian","Azilian","PAzil_IBC","ABP/Azilian","TRUE",3
+"Azilian (Pyrenees)","Azilian","PAzil_IBC","ABP/Azilian","TRUE",3
+"Aziloid Alps","Azilian","AzilTSG_ASH","ABP/Azilian","TRUE",3
+"Aziloid - Alps Tradition Southern Germany","Azilian","AzilTSG_ASH","ABP/Azilian","TRUE",3
+"Aziloid Tradition Eastern Central Europe","Azilian","AzilTECE_ASH","ABP/Azilian","TRUE",3
+"Aziloid - Tradition Eastern Central Europe","Azilian","AzilTECE_ASH","ABP/Azilian","TRUE",3
+"Early Azilian","Azilian","EAzil_SWF","ABP/Azilian","TRUE",3
+"Early Azilian","Azilian","EAzil_NF","ABP/Azilian","TRUE",3
+"Late Azilian","Azilian","LAzil_SWF","ABP/Azilian","TRUE",3
+"Late Azilian","Azilian","LAzil_NF","ABP/Azilian","TRUE",3
+"Older Azilian","Azilian","EAzil_CH","ABP/Azilian","TRUE",3
+"Younger Azilian","Azilian","LAzil_CH","ABP/Azilian","TRUE",3
+"ABP Federmesser","Federmesser","ABPFeder_BOMO","ABP/FMG","TRUE",4
+"ABP Tishnovian","Tishnovian","ABPTishn_BOMO","ABP/FMG","TRUE",4
+"Allerød CBP","Federmesser","Cres_GBS","ABP/FMG","TRUE",4
+"Allerød CBP","Federmesser","AFeder_GBS","ABP/FMG","TRUE",4
+"Atzenhofer group ","Atzenhofer","Atzen_SG","ABP/FMG","TRUE",4
+"Backed Blade/H-type CBP","Federmesser","HFeder_GBS","ABP/FMG","TRUE",4
+"Fazies Fürsteiner","Fuersteiner","Fuerst_CH","ABP/FMG","TRUE",4
+"Federmesser","Federmesser","Feder_BSN","ABP/FMG","TRUE",4
+"Federmesser","Federmesser","Feder_LT","ABP/FMG","TRUE",4
+"Federmesser","Federmesser","Feder_SS","ABP/FMG","TRUE",4
+"Federmesser ","Federmesser","Feder_NG","ABP/FMG","TRUE",4
+"Witowian","Witowian","Wito_PL","ABP/FMG","TRUE",4
