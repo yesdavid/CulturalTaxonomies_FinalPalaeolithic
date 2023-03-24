@@ -21,7 +21,7 @@
 "Hamburgian","Hamburgian","Ham_LT","Magdalenian","FALSE",1
 "Hamburgian","Hamburgian","Ham_NG","Magdalenian","FALSE",1
 "Hamburgian","Hamburgian","Ham_PL","Magdalenian","FALSE",1
-"Havelte","Havelte","Ham_SS","Magdalenian","FALSE",1
+"Havelte","Havelte","Hav_SS","Magdalenian","FALSE",1
 "Havelte","Havelte","Hav_GBS","Magdalenian","FALSE",1
 "Havelte ","Havelte","Hav_NG","Magdalenian","FALSE",1
 "Kamienna variant","Kamienna","Kam_PL","Magdalenian","FALSE",1
@@ -57,8 +57,8 @@
 "Epi-Ahrensburgian","Epiahrensburgian","EpiAhr_BSN","FBT/LBI","TRUE",6
 "Epi-Ahrensburgian","Epiahrensburgian","EpiAhr_PL","FBT/LBI","TRUE",6
 "Late Laborian","Laborian","LLab_SWF","FBT/LBI","TRUE",6
-"Long Blade Industries/Epi-Ahrensburgian (FBT)","Epiahrensburgian","FBBT_GBS","FBT/LBI","TRUE",6
-"Long Blade Industries/Epi-Ahrensburgian (FBT)","Epiahrensburgian","FBBT_GBS","FBT/LBI","TRUE",6
+"Long Blade Industries/Epi-Ahrensburgian (FBT)","Epiahrensburgian","FBT_GBS","FBT/LBI","TRUE",6
+"Long Blade Industries/Epi-Ahrensburgian (FBT)","Epiahrensburgian","FBT_GBS","FBT/LBI","TRUE",6
 "Epigravettiano recente","Epigravettian","REpigrav_ASH","Epigravettian","TRUE",2
 "Late Epigravettian","Epigravettian","LEpigrav_ASH","Epigravettian","TRUE",2
 "Late Epigravettian (Phase 2)","Epigravettian","LEpigrav_NEI","Epigravettian","TRUE",2
