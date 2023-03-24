@@ -404,18 +404,14 @@ svg(filename = file.path(output_path, "Fig_4_SES_plot.svg"),width =SES_plot_widt
 SES_plot
 dev.off()
 
+
 ##################################### 
 # bootstrapped dendrograms
 ##################################### 
 
-
+################
 # tools
-
-# plot(hclust(dist_tools_df_dummy))
-# ape::plot.phylo(ape::as.phylo(hclust(dist_tools_df_dummy)))
-# dist_tools_df_dummy_plot <-
-# ggtree(ape::ladderize(ape::as.phylo(hclust(dist_tools_df_dummy))))+
-#   geom_tiplab(align = F)
+################
 
 # bootstrapping
 dist_fun <- function(x) {
@@ -425,39 +421,49 @@ dist_fun <- function(x) {
   return(dista)
 }
 f <- function(x) {
-  # phangorn::upgma(dist_fun(x))
   ape::as.phylo(hclust((dist_fun(x)), method = "ward.D"))
 }
-tools_starting_tree <- f(tools_df)
+
+mod_tiplabs_tools_df <- tools_df
+  
+  mod_tiplabs_tools <- 
+    tools %>% 
+    dplyr::left_join(.,tiplabs_tools_df) %>% 
+    mutate(rownames = paste0(higher_order,"_",TaxUnit_unique_TS))
+  
+  mod_tiplabs_tools <- 
+    mod_tiplabs_tools[order(match(mod_tiplabs_tools$TaxUnit_unique_TS,tools$TaxUnit_unique_TS)),]
+  
+  rownames(mod_tiplabs_tools_df) <- mod_tiplabs_tools$rownames
+
+tools_starting_tree <- f(mod_tiplabs_tools_df)
+
+
 tools_X <- ape::boot.phylo(phy = tools_starting_tree, 
-                           x = tools_df, 
+                           x = mod_tiplabs_tools_df, 
                            FUN = f, 
                            trees = TRUE,
                            B = 1000) 
-tools_tree <- phangorn::plotBS(tools_starting_tree, tools_X$trees)
-tools_tree2 <- phangorn::pruneTree(tools_tree, 50)#mayority consensus tree
+tools_tree <- phangorn::plotBS(tools_starting_tree, tools_X$trees, type = "none")
+tools_tree2 <- phangorn::pruneTree(tools_tree, 50) #majority consensus tree
 
 dist_tools_df_dummy_plot <-
-  ggtree(tools_tree2)+
-  geom_tiplab(align = T) 
+  ggtree::ggtree(tools_tree2) +
+    ggtree::geom_tiplab(align = T) +
+    ggtree::geom_nodelab() +
+    ggtree::geom_nodepoint()
 
-q <- dist_tools_df_dummy_plot
-d <- q$data
-d <- d[!d$isTip,]
-d$label <- as.numeric(d$label)
 
-plopp <- q + geom_text(data=d, aes(label=label))
-
-tools_ggtree <- unique(as.data.frame(tiplabs_tools_df[tiplabs_tools_df$TaxUnit_unique_TS %in%
+tools_ggtree_df_full <- unique(as.data.frame(mod_tiplabs_tools[mod_tiplabs_tools$rownames %in%
                                                         tools_tree2$tip.label, ]) %>%
-                         dplyr::select(TaxUnit_unique_TS, higher_order, Expert_editor, chrono_order, color_hex) %>%
-                         dplyr::mutate(higher_order = forcats::fct_reorder(higher_order, chrono_order))) %>% 
+                         dplyr::select(rownames, TaxUnit_unique_TS, higher_order, chrono_order, color_hex) %>%
+                         dplyr::mutate(higher_order = forcats::fct_reorder(higher_order, chrono_order))) %>%
   unique()
 
-rownames(tools_ggtree) <- tools_ggtree$TaxUnit_unique_TS
+rownames(tools_ggtree_df_full) <- tools_ggtree_df_full$rownames
 
 tools_ggtree <- 
-tools_ggtree %>% 
+  tools_ggtree_df_full %>% 
   dplyr::select(higher_order)
 
 tools_ggtree <- dummies::dummy.data.frame(tools_ggtree, fun = as.logical)
@@ -470,10 +476,8 @@ for (i in colnames(tools_ggtree)) {
     
 }
 
-
-
 tools_bootstrap_color_plot <- 
-gheatmap(plopp,
+gheatmap(dist_tools_df_dummy_plot,
          tools_ggtree,
          offset = 0.1,
          width = 0.3,
@@ -482,15 +486,8 @@ gheatmap(plopp,
          colnames_position = "bottom",
          hjust = 1) +
   scale_x_ggtree() +
-  scale_y_continuous(expand=c(0,10))+
-  scale_fill_manual(values = c("NA" = "#999999", # NA
-                               "Azilian" = "#E69F00", # Azilian
-                               "FBBT/LBI" = "#56B4E9", # FBBT
-                               "Mesolithic" = "#009E73", # Meso
-                               "ABP" = "#F0E442", # ABP/FMG
-                               "LTP" = "#0072B2", # LTP/TPC
-                               "Magdalenian" = "#D55E00", # Magdalenian
-                               "Epigravettian" = "#CC79A7", # Epigravettian,
+  scale_y_continuous(expand=c(0,20)) +
+  scale_fill_manual(values = c(higher_order_hexcodes_manual, 
                                "FALSE" = "grey96")) +
   guides(fill="none") #+
   # ggtitle("Tools")#
@@ -500,53 +497,72 @@ tools_bootstrap_color_plot
 ggsave(plot = tools_bootstrap_color_plot,
        filename = file.path(output_path, "tools_bootstrap_color_plot.png"), 
        width = 35, height = 40, units = "cm")
-# ggsave(plot = tools_bootstrap_color_plot,
-#        filename = file.path(output_path, "tools_bootstrap_color_plot.svg"), 
-#        width = 35, height = 40, units = "cm")
+
+svg(filename = file.path(output_path, "tools_bootstrap_color_plot.svg"),width = 35, height = 40)
+tools_bootstrap_color_plot
+dev.off()
 
 
+################
 # technology
+################
 
-# # plot(hclust(dist_technology_df_dummy))
-# # ape::plot.phylo(ape::as.phylo(hclust(dist_technology_df_dummy)))
-# dist_technology_df_dummy_plot <-
-#   ggtree(ape::ladderize(ape::as.phylo(hclust(dist_technology_df_dummy))))+
-#   geom_tiplab(align = F)
+# bootstrapping
+dist_fun <- function(x) {
+  dista <- vegan::vegdist(x = x,
+                          method = "gower")
+  dista[is.nan(dista)] <- 0 # for gower distance in vegdist: if two taxa have the same traits, vegdist returns NaN
+  return(dista)
+}
+f <- function(x) {
+  ape::as.phylo(hclust((dist_fun(x)), method = "ward.D"))
+}
 
-technology_starting_tree <- f(technology_df)
+mod_tiplabs_technology_df <- technology_df
+
+mod_tiplabs_technology <- 
+  technology %>% 
+  dplyr::left_join(.,tiplabs_technology_df) %>% 
+  mutate(rownames = paste0(higher_order,"_",TaxUnit_unique_TS))
+
+mod_tiplabs_technology <- 
+  mod_tiplabs_technology[order(match(mod_tiplabs_technology$TaxUnit_unique_TS,technology$TaxUnit_unique_TS)),]
+
+rownames(mod_tiplabs_technology_df) <- mod_tiplabs_technology$rownames
+
+technology_starting_tree <- f(mod_tiplabs_technology_df)
+
+
 technology_X <- ape::boot.phylo(phy = technology_starting_tree, 
-                                x = technology_df, 
-                                FUN = f, 
-                                trees = TRUE,
-                                B = 1000) 
-# phytools::writeNexus(technology_X$trees,
-#                      file = file.path(output_path, "technology_trees.trees"))
-
-technology_tree <- phangorn::plotBS(technology_starting_tree, technology_X$trees)
-technology_tree2 <- phangorn::pruneTree(technology_tree, 50.01)#mayority consensus tree
+                           x = mod_tiplabs_technology_df, 
+                           FUN = f, 
+                           trees = TRUE,
+                           B = 1000) 
+technology_tree <- phangorn::plotBS(technology_starting_tree, technology_X$trees, type = "none")
+technology_tree2 <- phangorn::pruneTree(technology_tree, 50) #majority consensus tree
 
 dist_technology_df_dummy_plot <-
-  ggtree(technology_tree2)+
-  geom_tiplab(align = T)
+  ggtree::ggtree(technology_tree2) +
+  ggtree::geom_tiplab(align = T) +
+  ggtree::geom_nodelab() +
+  ggtree::geom_nodepoint()
 
-q <- dist_technology_df_dummy_plot
-d <- q$data
-d <- d[!d$isTip,]
-d$label <- as.numeric(d$label)
+technology_ggtree_df_full <- unique(as.data.frame(mod_tiplabs_technology[mod_tiplabs_technology$rownames %in%
+                                                                 technology_tree2$tip.label, ]) %>%
+                                 dplyr::select(rownames, TaxUnit_unique_TS, higher_order, chrono_order, color_hex) %>%
+                                 dplyr::mutate(higher_order = forcats::fct_reorder(higher_order, chrono_order))) %>%
+  unique()
 
-blopp <- q + geom_text(data=d, aes(label=label))
+subset(technology_ggtree_df_full, is.na(color_hex))
 
-technology_ggtree <- unique(as.data.frame(tiplabs_technology_df[tiplabs_technology_df$TaxUnit_unique_TS %in%
-                                                                  technology_tree2$tip.label, ]) %>%
-                              select(TaxUnit_unique_TS, higher_order, Expert_editor) %>%
-                              mutate(higher_order = as.factor(higher_order)))
+rownames(technology_ggtree_df_full) <- technology_ggtree_df_full$rownames
 
-rownames(technology_ggtree) <- technology_ggtree$TaxUnit_unique_TS
-
-technology_ggtree <- technology_ggtree %>% 
-  select(higher_order)
+technology_ggtree <- 
+  technology_ggtree_df_full %>% 
+  dplyr::select(higher_order)
 
 technology_ggtree <- dummies::dummy.data.frame(technology_ggtree, fun = as.logical)
+
 colnames(technology_ggtree) <- gsub("higher_order", "", colnames(technology_ggtree))
 
 for (i in colnames(technology_ggtree)) {
@@ -555,28 +571,21 @@ for (i in colnames(technology_ggtree)) {
   
 }
 
-
 technology_bootstrap_color_plot <- 
-gheatmap(blopp,
-         technology_ggtree,
-         offset = 0.1,
-         width = 0.3,
-         colnames_angle = 45,
-         # colnames_offset_y = -0.3,
-         colnames_position = "bottom",
-         hjust = 1) +
+  gheatmap(dist_technology_df_dummy_plot,
+           technology_ggtree,
+           offset = 0.1,
+           width = 0.3,
+           colnames_angle = 45,
+           # colnames_offset_y = -0.3,
+           colnames_position = "bottom",
+           hjust = 1) +
   scale_x_ggtree() +
-  scale_y_continuous(expand=c(0,10))+  
-  scale_fill_manual(values = c("NA" = "#999999", # NA
-                               "Azilian" = "#E69F00", # Azilian
-                               "FBBT/LBI" = "#56B4E9", # FBBT
-                               "Mesolithic" = "#009E73", # Meso
-                               "ABP" = "#F0E442", # ABP/FMG
-                               "LTP" = "#0072B2", # LTP/TPC
-                               "Magdalenian" = "#D55E00", # Magdalenian
-                               "Epigravettian" = "#CC79A7", # Epigravettian,
+  scale_y_continuous(expand=c(0,20)) +
+  scale_fill_manual(values = c(higher_order_hexcodes_manual, 
                                "FALSE" = "grey96")) +
-  guides(fill="none") 
+  guides(fill="none") #+
+# ggtitle("technology")#
 
 technology_bootstrap_color_plot
 
@@ -584,12 +593,17 @@ ggsave(plot = technology_bootstrap_color_plot,
        filename = file.path(output_path, "technology_bootstrap_color_plot.png"), 
        width = 35, height = 40, units = "cm")
 
+svg(filename = file.path(output_path, "technology_bootstrap_color_plot.svg"),width = 35, height = 40)
+technology_bootstrap_color_plot
+dev.off()
+
+
+
+################
 # outlines 
+################
 
-
-# plot(hclust(dist_tools_df_dummy))
-# ape::plot.phylo(ape::as.phylo(hclust(dist_tools_df_dummy)))
-hclust_outlines <- hclust(dist(outlines_AR_centered_w_metric_measures_scaled_PCA$x[,c(1:scree_min)],
+hclust_outlines <- hclust(dist(outlines_AR_centered_w_metric_measures_scaled_PCA$x[,],
                                upper = F))
 
 dist_outlines_df_dummy_plot <-
@@ -598,10 +612,11 @@ dist_outlines_df_dummy_plot <-
 
 set.seed(123)
 stratified_subset_outlines_taxunit <- splitstackshape::stratified(tiplabs_outlines_df,
-                                                                  group = "TaxUnit_unique",
+                                                                  group = c("TaxUnit_unique"),
                                                                   size = 5)
 
-outlines_subset <- outlines_AR_centered_w_metric_measures_scaled_PCA$x[which(rownames(outlines_AR_centered_w_metric_measures_scaled_PCA$x) %in% stratified_subset_outlines_taxunit$tiplab),c(1:scree_min)]
+outlines_subset <- outlines_AR_centered_w_metric_measures_scaled_PCA$x[which(rownames(outlines_AR_centered_w_metric_measures_scaled_PCA$x) %in% 
+                                                                               stratified_subset_outlines_taxunit$tiplab),]
 
 f_o <- function(x) ape::as.phylo(hclust(dist(x), method = "ward.D2"))
 outlines_starting_tree <- f_o(outlines_subset)
@@ -613,20 +628,15 @@ outlines_X <- ape::boot.phylo(phy = outlines_starting_tree,
 # phytools::writeNexus(outlines_X$trees,
 #                      file = file.path(output_path, "outlines_trees.trees"))
 
-outlines_tree <- phangorn::plotBS(outlines_starting_tree, outlines_X$trees)
-outlines_tree2 <- phangorn::pruneTree(outlines_tree, 50.01)#mayority consensus tree
+outlines_tree <- phangorn::plotBS(outlines_starting_tree, outlines_X$trees, type = "none")
+outlines_tree2 <- phangorn::pruneTree(outlines_tree, 50)#mayority consensus tree
 
 dist_outlines_df_dummy_plot <-
-  ggtree(outlines_tree2) #+
-# geom_tiplab(align = T)
+  ggtree(outlines_tree2) +
+  ggtree::geom_tiplab(align = T) +
+  ggtree::geom_nodelab() +
+  ggtree::geom_nodepoint()
 
-q <- dist_outlines_df_dummy_plot
-d <- q$data
-d <- d[!d$isTip,]
-d$label <- as.numeric(d$label)
-d <- d[d$label > 50,]
-
-blubb <- q + geom_text(data=d, aes(label=label))
 
 outlines_ggtree <- unique(as.data.frame(tiplabs_outlines_df[tiplabs_outlines_df$tiplab %in%
                                                               stratified_subset_outlines_taxunit$tiplab, ]) %>%
@@ -646,7 +656,7 @@ for (i in colnames(outlines_ggtree)) {
 
 
 outlines_bootstrap_color_plot <- 
-  gheatmap(blubb,
+  gheatmap(dist_outlines_df_dummy_plot,
            outlines_ggtree,
            offset = 0.1,
            width = 0.3,
@@ -1110,7 +1120,7 @@ only_singleTS_outlines_matrix <- data.frame(Timeslice= only_singleTS_outlines$Ti
 outlines_dist.time <- dist(only_singleTS_outlines_matrix,
                            upper = F)
 outlines_dist_matrix_time <- dist(outlines_AR_centered_w_metric_measures_scaled_PCA$x[which(rownames(outlines_AR_centered_w_metric_measures_scaled_PCA$x)%in%only_singleTS_outlines$ARTEFACTNAME),
-                                                           c(1:scree_min)],
+                                                           ],
        upper = F)
 mantel_outlines_time <- 
   ecodist::mantel(outlines_dist_matrix_time ~ outlines_dist.time,
