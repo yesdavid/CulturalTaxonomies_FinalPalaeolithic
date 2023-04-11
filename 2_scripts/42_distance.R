@@ -23,10 +23,10 @@ data.frame(row.names = c("A", "B", "C"),
            trait2 = c(0,1,1),
            trait3 = c(0,2,0))
 
-# hamming distance
-library(e1071)
-e1071::hamming.distance(as.matrix(test_df)) # hamming dist
-e1071::hamming.distance(as.matrix(test_df))/ncol(test_df) # effectively gower dist
+# # hamming distance
+# library(e1071)
+# e1071::hamming.distance(as.matrix(test_df)) # hamming dist
+# e1071::hamming.distance(as.matrix(test_df))/ncol(test_df) # effectively gower dist
 
 # gower distance
 vegan::vegdist(x = test_df,
@@ -55,16 +55,19 @@ source(file.path("2_scripts",
                  "color_palette.R"))
 higher_order_hexcodes
 
-higher_order_hexcodes_manual <- setNames(higher_order_hexcodes$color_hex,
-                                         higher_order_hexcodes$higher_order)
 
 taxgroups_fac_hexcodes <- 
   dplyr::left_join(taxgroups,
                    higher_order_hexcodes) 
-taxgroups_fac_hexcodes$higher_order  <-  factor(taxgroups_fac_hexcodes$higher_order,
-                                                   levels = forcats::fct_reorder(unique(taxgroups_fac_hexcodes$higher_order),
-                                                                                 unique(taxgroups_fac_hexcodes$chrono_order)))
+taxgroups_fac_hexcodes$higher_order <- factor(taxgroups_fac_hexcodes$higher_order,
+                                              levels = c("Magdalenian", "Epigravettian", "ABP/Azilian", "ABP/FMG", 
+                                                         "TPC", "FBT/LBI", "Mesolithic", "Not classified"))
 
+higher_order_hexcodes_manual <- setNames(higher_order_hexcodes$color_hex,
+                                         higher_order_hexcodes$higher_order)
+higher_order_hexcodes_manual <- 
+  higher_order_hexcodes_manual[order(factor(names(higher_order_hexcodes_manual), 
+                                            levels = levels(taxgroups_fac_hexcodes$higher_order)))]
 
 ###########
 # TOOLS
@@ -366,6 +369,7 @@ cophenet_TaxUnit_df_list_datatype_df_NO_notClassified$class <-
   factor(cophenet_TaxUnit_df_list_datatype_df_NO_notClassified$class,
          levels = c("Tools", "Technology", "Outlines"))
 
+gc()
 
 library(ggplot2)
 SES_plot <-
@@ -404,6 +408,7 @@ svg(filename = file.path(output_path, "Fig_4_SES_plot.svg"),width =SES_plot_widt
 SES_plot
 dev.off()
 
+gc()
 
 ##################################### 
 # bootstrapped dendrograms
@@ -425,19 +430,8 @@ f <- function(x) {
 }
 
 mod_tiplabs_tools_df <- tools_df
-  
-  mod_tiplabs_tools <- 
-    tools %>% 
-    dplyr::left_join(.,tiplabs_tools_df) %>% 
-    mutate(rownames = paste0(higher_order,"_",TaxUnit_unique_TS))
-  
-  mod_tiplabs_tools <- 
-    mod_tiplabs_tools[order(match(mod_tiplabs_tools$TaxUnit_unique_TS,tools$TaxUnit_unique_TS)),]
-  
-  rownames(mod_tiplabs_tools_df) <- mod_tiplabs_tools$rownames
 
 tools_starting_tree <- f(mod_tiplabs_tools_df)
-
 
 tools_X <- ape::boot.phylo(phy = tools_starting_tree, 
                            x = mod_tiplabs_tools_df, 
@@ -449,56 +443,56 @@ tools_tree2 <- phangorn::pruneTree(tools_tree, 50) #majority consensus tree
 
 dist_tools_df_dummy_plot <-
   ggtree::ggtree(tools_tree2) +
-    ggtree::geom_tiplab(align = T) +
-    ggtree::geom_nodelab() +
-    ggtree::geom_nodepoint()
+  ggtree::geom_tiplab(align = T) +
+  # ggtree::geom_nodelab() +
+  ggtree::geom_nodepoint()
 
+tools_ggtree <-
+  tiplabs_tools_df %>% 
+  arrange(desc(higher_order)) %>% 
+  dplyr::select(TaxUnit_unique_TS, higher_order) %>%
+  unique() 
 
-tools_ggtree_df_full <- unique(as.data.frame(mod_tiplabs_tools[mod_tiplabs_tools$rownames %in%
-                                                        tools_tree2$tip.label, ]) %>%
-                         dplyr::select(rownames, TaxUnit_unique_TS, higher_order, chrono_order, color_hex) %>%
-                         dplyr::mutate(higher_order = forcats::fct_reorder(higher_order, chrono_order))) %>%
-  unique()
+dummy_df_tech <- 
+  data.frame(tools_ggtree$higher_order,
+             row.names =  tools_ggtree$TaxUnit_unique_TS)
 
-rownames(tools_ggtree_df_full) <- tools_ggtree_df_full$rownames
+colnames(dummy_df_tech) <- "higher_order"
 
 tools_ggtree <- 
-  tools_ggtree_df_full %>% 
-  dplyr::select(higher_order)
+  dummy_df_tech %>% 
+  dummies::dummy.data.frame(., fun = as.logical) 
 
-tools_ggtree <- dummies::dummy.data.frame(tools_ggtree, fun = as.logical)
-
-colnames(tools_ggtree) <- gsub("higher_order", "", colnames(tools_ggtree))
-
+colnames(tools_ggtree) <- gsub("higher_order","", colnames(tools_ggtree))
 for (i in colnames(tools_ggtree)) {
   
   tools_ggtree[[i]] <- gsub(TRUE, paste0(i), tools_ggtree[[i]])
-    
+  
 }
 
-tools_bootstrap_color_plot <- 
-gheatmap(dist_tools_df_dummy_plot,
-         tools_ggtree,
-         offset = 0.1,
-         width = 0.3,
-         colnames_angle = 45,
-         # colnames_offset_y = -0.3,
-         colnames_position = "bottom",
-         hjust = 1) +
+tools_bootstrap_color_plot <-
+  gheatmap(dist_tools_df_dummy_plot,
+           tools_ggtree,
+           offset = 0.4,
+           width = 0.4,
+           colnames_angle = 90,
+           # colnames_offset_y = -0.3,
+           colnames_position = "bottom",
+           hjust = 1) +
   scale_x_ggtree() +
   scale_y_continuous(expand=c(0,20)) +
   scale_fill_manual(values = c(higher_order_hexcodes_manual, 
                                "FALSE" = "grey96")) +
   guides(fill="none") #+
-  # ggtitle("Tools")#
+# ggtitle("tools")#
 
 tools_bootstrap_color_plot
 
 ggsave(plot = tools_bootstrap_color_plot,
-       filename = file.path(output_path, "tools_bootstrap_color_plot.png"), 
-       width = 35, height = 40, units = "cm")
+       filename = file.path(output_path, "Fig_5A_tools_bootstrap_color_plot.png"), 
+       width = 30, height = 50, units = "cm")
 
-svg(filename = file.path(output_path, "tools_bootstrap_color_plot.svg"),width = 35, height = 40)
+svg(filename = file.path(output_path, "Fig_5A_tools_bootstrap_color_plot.svg"),width = 15*0.69, height = 50*0.39)
 tools_bootstrap_color_plot
 dev.off()
 
@@ -520,18 +514,7 @@ f <- function(x) {
 
 mod_tiplabs_technology_df <- technology_df
 
-mod_tiplabs_technology <- 
-  technology %>% 
-  dplyr::left_join(.,tiplabs_technology_df) %>% 
-  mutate(rownames = paste0(higher_order,"_",TaxUnit_unique_TS))
-
-mod_tiplabs_technology <- 
-  mod_tiplabs_technology[order(match(mod_tiplabs_technology$TaxUnit_unique_TS,technology$TaxUnit_unique_TS)),]
-
-rownames(mod_tiplabs_technology_df) <- mod_tiplabs_technology$rownames
-
 technology_starting_tree <- f(mod_tiplabs_technology_df)
-
 
 technology_X <- ape::boot.phylo(phy = technology_starting_tree, 
                            x = mod_tiplabs_technology_df, 
@@ -544,39 +527,38 @@ technology_tree2 <- phangorn::pruneTree(technology_tree, 50) #majority consensus
 dist_technology_df_dummy_plot <-
   ggtree::ggtree(technology_tree2) +
   ggtree::geom_tiplab(align = T) +
-  ggtree::geom_nodelab() +
+  # ggtree::geom_nodelab() +
   ggtree::geom_nodepoint()
 
-technology_ggtree_df_full <- unique(as.data.frame(mod_tiplabs_technology[mod_tiplabs_technology$rownames %in%
-                                                                 technology_tree2$tip.label, ]) %>%
-                                 dplyr::select(rownames, TaxUnit_unique_TS, higher_order, chrono_order, color_hex) %>%
-                                 dplyr::mutate(higher_order = forcats::fct_reorder(higher_order, chrono_order))) %>%
-  unique()
+technology_ggtree <-
+  tiplabs_technology_df %>% 
+  arrange(desc(higher_order)) %>% 
+  dplyr::select(TaxUnit_unique_TS, higher_order) %>%
+    unique() 
 
-subset(technology_ggtree_df_full, is.na(color_hex))
+dummy_df_tech <- 
+  data.frame(technology_ggtree$higher_order,
+             row.names =  technology_ggtree$TaxUnit_unique_TS)
 
-rownames(technology_ggtree_df_full) <- technology_ggtree_df_full$rownames
+colnames(dummy_df_tech) <- "higher_order"
 
 technology_ggtree <- 
-  technology_ggtree_df_full %>% 
-  dplyr::select(higher_order)
+dummy_df_tech %>% 
+  dummies::dummy.data.frame(., fun = as.logical) 
 
-technology_ggtree <- dummies::dummy.data.frame(technology_ggtree, fun = as.logical)
-
-colnames(technology_ggtree) <- gsub("higher_order", "", colnames(technology_ggtree))
-
+colnames(technology_ggtree) <- gsub("higher_order","", colnames(technology_ggtree))
 for (i in colnames(technology_ggtree)) {
-  
+
   technology_ggtree[[i]] <- gsub(TRUE, paste0(i), technology_ggtree[[i]])
-  
+
 }
 
 technology_bootstrap_color_plot <- 
   gheatmap(dist_technology_df_dummy_plot,
            technology_ggtree,
-           offset = 0.1,
-           width = 0.3,
-           colnames_angle = 45,
+           offset = 0.5,
+           width = 0.4,
+           colnames_angle = 90,
            # colnames_offset_y = -0.3,
            colnames_position = "bottom",
            hjust = 1) +
@@ -590,10 +572,10 @@ technology_bootstrap_color_plot <-
 technology_bootstrap_color_plot
 
 ggsave(plot = technology_bootstrap_color_plot,
-       filename = file.path(output_path, "technology_bootstrap_color_plot.png"), 
-       width = 35, height = 40, units = "cm")
+       filename = file.path(output_path, "Fig_5B_technology_bootstrap_color_plot.png"), 
+       width = 25, height = 50, units = "cm")
 
-svg(filename = file.path(output_path, "technology_bootstrap_color_plot.svg"),width = 35, height = 40)
+svg(filename = file.path(output_path, "Fig_5B_technology_bootstrap_color_plot.svg"),width = 25*0.39, height = 50*0.39)
 technology_bootstrap_color_plot
 dev.off()
 
@@ -609,14 +591,29 @@ hclust_outlines <- hclust(dist(outlines_AR_centered_w_metric_measures_scaled_PCA
 dist_outlines_df_dummy_plot <-
   ggtree(hclust_outlines)
 
+change_outline_names_FUN <- 
+function(x){
+  outlines_tiplabs_list <- list()
+  for(i in 1:length(x)){
+    current_label <- strsplit(x[[i]], "_")[[1]]
+    outlines_tiplabs_list[[i]] <- 
+      paste0(current_label[1], "_", current_label[2],"_",  current_label[3],"_",  current_label[4], "_", 
+             current_label[7],current_label[8], "_", current_label[length(current_label)])
+  }
+  unlist(outlines_tiplabs_list)
+}
+
+tiplabs_outlines_df$tip.label <- change_outline_names_FUN(tiplabs_outlines_df$tiplab)
 
 set.seed(123)
 stratified_subset_outlines_taxunit <- splitstackshape::stratified(tiplabs_outlines_df,
                                                                   group = c("TaxUnit_unique"),
-                                                                  size = 5)
+                                                                  size = 2)
 
 outlines_subset <- outlines_AR_centered_w_metric_measures_scaled_PCA$x[which(rownames(outlines_AR_centered_w_metric_measures_scaled_PCA$x) %in% 
                                                                                stratified_subset_outlines_taxunit$tiplab),]
+
+rownames(outlines_subset) <- change_outline_names_FUN(rownames(outlines_subset))
 
 f_o <- function(x) ape::as.phylo(hclust(dist(x), method = "ward.D2"))
 outlines_starting_tree <- f_o(outlines_subset)
@@ -629,21 +626,23 @@ outlines_X <- ape::boot.phylo(phy = outlines_starting_tree,
 #                      file = file.path(output_path, "outlines_trees.trees"))
 
 outlines_tree <- phangorn::plotBS(outlines_starting_tree, outlines_X$trees, type = "none")
-outlines_tree2 <- phangorn::pruneTree(outlines_tree, 50)#mayority consensus tree
+outlines_tree2 <- phangorn::pruneTree(outlines_tree, 50)#majority consensus tree
 
 dist_outlines_df_dummy_plot <-
   ggtree(outlines_tree2) +
   ggtree::geom_tiplab(align = T) +
-  ggtree::geom_nodelab() +
+  # ggtree::geom_nodelab() +
   ggtree::geom_nodepoint()
 
 
-outlines_ggtree <- unique(as.data.frame(tiplabs_outlines_df[tiplabs_outlines_df$tiplab %in%
-                                                              stratified_subset_outlines_taxunit$tiplab, ]) %>%
-                            select(tiplab, higher_order) %>%
+outlines_ggtree <- unique(as.data.frame(tiplabs_outlines_df[tiplabs_outlines_df$tip.label %in%
+                                                              stratified_subset_outlines_taxunit$tip.label, ]) %>%
+                            select(tip.label, higher_order) %>%
                             mutate(higher_order = as.factor(higher_order)))
-rownames(outlines_ggtree) <- outlines_ggtree$tiplab
+rownames(outlines_ggtree) <- outlines_ggtree$tip.label
 outlines_ggtree <- outlines_ggtree %>% select(higher_order)
+outlines_ggtree$higher_order <- factor(outlines_ggtree$higher_order,
+                                       levels = levels(taxgroups_fac_hexcodes$higher_order))
 outlines_ggtree <- dummies::dummy.data.frame(outlines_ggtree, fun = as.logical)
 colnames(outlines_ggtree) <- gsub("higher_order", "", colnames(outlines_ggtree))
 
@@ -658,22 +657,15 @@ for (i in colnames(outlines_ggtree)) {
 outlines_bootstrap_color_plot <- 
   gheatmap(dist_outlines_df_dummy_plot,
            outlines_ggtree,
-           offset = 0.1,
+           offset = 0.6,
            width = 0.3,
-           colnames_angle = 45,
+           colnames_angle = 90,
            # colnames_offset_y = -0.3,
            colnames_position = "bottom",
            hjust = 1) +
   scale_x_ggtree() +
   scale_y_continuous(expand=c(0,40))+  
-  scale_fill_manual(values = c("NA" = "#999999", # NA
-                               "Azilian" = "#E69F00", # Azilian
-                               "FBBT/LBI" = "#56B4E9", # FBBT
-                               "Mesolithic" = "#009E73", # Meso
-                               "ABP" = "#F0E442", # ABP/FMG
-                               "LTP" = "#0072B2", # LTP/TPC
-                               "Magdalenian" = "#D55E00", # Magdalenian
-                               "Epigravettian" = "#CC79A7", # Epigravettian,
+  scale_fill_manual(values = c(higher_order_hexcodes_manual, 
                                "FALSE" = "grey96")) +
   guides(fill="none") 
 
@@ -682,10 +674,12 @@ outlines_bootstrap_color_plot
 
 
 ggsave(plot = outlines_bootstrap_color_plot,
-       filename = file.path(output_path, "outlines_bootstrap_color_plot.png"), 
-       width = 35, height = 40, units = "cm")
+       filename = file.path(output_path, "Fig_5C_outlines_bootstrap_color_plot.png"), 
+       width = 40, height = 80, units = "cm")
 
-
+svg(filename = file.path(output_path, "Fig_5C_outlines_bootstrap_color_plot.svg"),width = 40*0.39, height = 80*0.39)
+outlines_bootstrap_color_plot
+dev.off()
 
 ##################################### 
 # tanglegram tools-technology 
@@ -696,6 +690,7 @@ library(dendextend)
 # dndlist <- dendextend::dendlist(phytools::force.ultrametric(tools_tree2), phytools::force.ultrametric(technology_tree2))
 dndlist <- dendextend::dendlist(as.dendrogram(tools_starting_tree), as.dendrogram(technology_starting_tree))
 
+png(filename = file.path(output_path, "Fig_6_tanglegram_tools_tech.png"), width = 40*0.39, height = 30*0.39, units = "in", res = 320)
 dendextend::tanglegram(dndlist,
                        highlight_distinct_edges = F,
                        common_subtrees_color_lines = T,
@@ -704,81 +699,22 @@ dendextend::tanglegram(dndlist,
                        margin_inner = 10,
                        sort = T,
                        main_left = "Tools",
-                       main_right = "Technology")
+                       main_right = "Technology",
+                       axes = F)
+dev.off()
 
-
-ggsave(plot = last_plot(),
-       filename = file.path(output_path, "tanglegram_tools_tech.png"), 
-       width = 35, height = 40, units = "cm")
-
-# tools_to_prune <- labels(as.dendrogram(hclust(dist_tools_df_dummy)))[which(!(labels(as.dendrogram(hclust(dist_tools_df_dummy))) %in%
-#                                                                                labels(as.dendrogram(hclust(dist_technology_df_dummy)))))]
-# 
-# tech_to_prune <- labels(as.dendrogram(hclust(dist_technology_df_dummy)))[which(!(labels(as.dendrogram(hclust(dist_technology_df_dummy))) %in%
-#                                                                                    labels(as.dendrogram(hclust(dist_tools_df_dummy)))))]
-# 
-# tech_dendro <- as.dendrogram(hclust(dist_technology_df_dummy))
-# tools_dendro <- as.dendrogram(hclust(dist_tools_df_dummy))
-# 
-# dndlist2 <- dendextend::dendlist(dendextend::prune(tools_dendro, tools_to_prune),
-#                                  dendextend::prune(tech_dendro, tech_to_prune))
-# dndlist2 %>% entanglement()
-# dndlist2 %>% untangle(method = "DendSer") %>%
-#   tanglegram(highlight_distinct_edges = F,
-#              common_subtrees_color_lines = T,
-#              common_subtrees_color_lines_default_single_leaf_color = "grey",
-#              common_subtrees_color_branches = FALSE,
-#              margin_inner = 8,
-#              sort = T,
-#              main_left = "Tools",
-#              main_right = "Technology")
-# 
-# # while (TRUE) tools_dendro <- click_rotate(tools_dendro)
-# 
-# tools_multi <- ape::di2multi(ape::as.phylo(hclust(dist_tools_df_dummy)), 0.055)
-# plot(tools_multi)
-# technology_multi <- ape::di2multi(ape::as.phylo(hclust(dist_technology_df_dummy)), 0.0475)
-# plot(technology_multi)
-# 
-# dendextend::dendlist(as.dendrogram(phytools::force.ultrametric(ape::ladderize(tools_multi))),
-#                      as.dendrogram(phytools::force.ultrametric(ape::ladderize(technology_multi)))) %>%
-#   untangle(method = "DendSer") %>%
-#   tanglegram(highlight_distinct_edges = F,
-#              common_subtrees_color_lines = T,
-#              common_subtrees_color_lines_default_single_leaf_color = "grey",
-#              common_subtrees_color_branches = FALSE,
-#              margin_inner = 8,
-#              sort = T,
-#              main_left = "Tools",
-#              main_right = "Technology")
-
-# obj2 <- phytools::cophylo(tr1= phytools::force.ultrametric(ape::ladderize(ape::as.phylo((dendextend::prune(tools_multi, tools_to_prune))))),
-#                           tr2 = phytools::force.ultrametric(ape::ladderize(ape::as.phylo(dendextend::prune(technology_multi, tech_to_prune)))),
-#                           # assoc = matrix(c(labels(as.dendrogram(hclust(dist_technology_df_dummy)))[which((labels(as.dendrogram(hclust(dist_technology_df_dummy))) %in%
-#                           #                                                                                   labels(as.dendrogram(hclust(dist_tools_df_dummy)))))],
-#                           #                  labels(as.dendrogram(hclust(dist_technology_df_dummy)))[which((labels(as.dendrogram(hclust(dist_technology_df_dummy))) %in%
-#                           #                                                                                   labels(as.dendrogram(hclust(dist_tools_df_dummy)))))]),
-#                           #                ncol = 2),
-#                           use.edge.length= T)
-# library(phytools)
-# plot(obj2, link.type="curved",link.lwd=4,
-#      link.lty="solid",link.col=make.transparent("red",
-#                                                 0.25))
-# obj <- phytools::cophylo(tr1= ape::as.phylo(hclust(dist_tools_df_dummy)),
-#                          tr2 = ape::as.phylo(hclust(dist_technology_df_dummy)),
-#                          use.edge.length= F)
-# plot(obj, link.type="curved",link.lwd=4,
-#      link.lty="solid",link.col=make.transparent("red",
-#                                                 0.25))
-# 
-# 
-# obj <- phytools::cophylo(tr1= tools_tree2,
-#                          tr2 = technology_tree2,
-#                          use.edge.length= F,
-#                          rotate = T)
-# plot(obj, link.type="curved",link.lwd=1,
-#      link.lty="solid",link.col=make.transparent("red",
-#                                                 0.25))
+svg(filename = file.path(output_path, "Fig_6_tanglegram_tools_tech.svg"),width = 40*0.39, height = 30*0.39)
+dendextend::tanglegram(dndlist,
+                       highlight_distinct_edges = F,
+                       common_subtrees_color_lines = T,
+                       common_subtrees_color_lines_default_single_leaf_color = "grey96",
+                       common_subtrees_color_branches = F,
+                       margin_inner = 10,
+                       sort = T,
+                       main_left = "Tools",
+                       main_right = "Technology",
+                       axes = F)
+dev.off()
 
 
 
@@ -829,7 +765,7 @@ technology_coord_matrix <- as.data.frame(technology_coord[,c("Macro_region_code_
                                                              "Macro_region_code_mean_Lat", 
                                                              "TaxUnit_unique_TS")])
 rownames(technology_coord_matrix) <- technology_coord_matrix$TaxUnit_unique_TS
-if(duplicated(technology_coord_matrix$TaxUnit_unique_TS)==T){
+if(any(duplicated(technology_coord_matrix$TaxUnit_unique_TS)==T)){
   technology_coord_matrix <- technology_coord_matrix[-which(duplicated(technology_coord_matrix$TaxUnit_unique_TS)),]
 }
 technology_coord_matrix <- technology_coord_matrix[,-which(colnames(technology_coord_matrix) == "TaxUnit_unique_TS")]
@@ -843,10 +779,11 @@ tech_dist.geo = as.dist(tech_d.geo)
 # tools
 tools_coord_matrix <- tools_coord[,c("Macro_region_code_mean_Long", 
                                      "Macro_region_code_mean_Lat", 
-                                     "TaxUnit_unique_TS")]
+                                     "TaxUnit_unique_TS")] %>% 
+  as.data.frame()
 rownames(tools_coord_matrix) <- tools_coord_matrix$TaxUnit_unique_TS
 
-if(duplicated(tools_coord_matrix$TaxUnit_unique_TS)==T){
+if(any(duplicated(tools_coord_matrix$TaxUnit_unique_TS)==T)){
   tools_coord_matrix <- tools_coord_matrix[-which(duplicated(tools_coord_matrix$TaxUnit_unique_TS)),]
 }
 tools_coord_matrix <- tools_coord_matrix[,-which(colnames(tools_coord_matrix) == "TaxUnit_unique_TS")]
@@ -877,7 +814,7 @@ rownames(outlines_d.geo) <- outlines_coord_matrix_names$ARTEFACTNAME
 colnames(outlines_d.geo) <- outlines_coord_matrix_names$ARTEFACTNAME
 outlines_dist.geo = as.dist(outlines_d.geo)
 
-
+######################################
 # cophenetic vs geographic distance
 
 # technology
@@ -896,8 +833,9 @@ tech_correlog <- vegan::mantel.correlog(D.eco = dist_technology_df_dummy,
                                         r.type="spearman", 
                                         nperm=1000,
                                         mult = "hochberg")
-tech_correlog   
-plot(tech_correlog)
+# tech_correlog   
+# plot(tech_correlog)
+
 # outdist <- as.vector(as.dist(dist_technology_df_dummy))
 # geodist <- as.vector(tech_dist.geo)/1000
 # blubb <- data.frame(outdist = outdist,
@@ -921,8 +859,9 @@ tools_correlog <- vegan::mantel.correlog(D.eco = dist_tools_df_dummy,
                                         r.type="spearman", 
                                         nperm=1000,
                                         mult = "hochberg")
-tools_correlog   
-plot(tools_correlog)
+# tools_correlog   
+# plot(tools_correlog)
+
 # outdist <- as.vector(as.dist(dist_tools_df_dummy))
 # geodist <- as.vector(tools_dist.geo)/1000
 # blubb <- data.frame(outdist = outdist,
@@ -939,26 +878,26 @@ vegan::mantel.partial(dist_tools_df_dummy,
                       tools_dist.geo/1000,
                       permutations=1000)
 
-# expert editor
-exped <- data.frame(Expert_editor = tools_coord$Expert_editor,
-                    row.names = tools_coord$TaxUnit_unique_TS)
-exped_dummy <- dummies::dummy.data.frame(exped)
-exped_dummy_jacc <- vegan::vegdist(exped_dummy,
-                                   method = "gower")
-plot(hclust(exped_dummy_jacc))
-
-vegan::mantel(dist_tools_df_dummy , exped_dummy_jacc)
-
-vegan::mantel.partial(dist_tools_df_dummy, 
-                      dist_technology_df_dummy,
-                      exped_dummy_jacc,
-                      permutations=1000)
-
-vegan::mantel(dist_technology_df_dummy , exped_dummy_jacc)
-vegan::mantel.partial(dist_technology_df_dummy,
-                      dist_tools_df_dummy, 
-                      exped_dummy_jacc,
-                      permutations=1000)
+# # expert editor
+# exped <- data.frame(Expert_editor = tools_coord$Expert_editor,
+#                     row.names = tools_coord$TaxUnit_unique_TS)
+# exped_dummy <- dummies::dummy.data.frame(exped)
+# exped_dummy_jacc <- vegan::vegdist(exped_dummy,
+#                                    method = "gower")
+# plot(hclust(exped_dummy_jacc))
+# 
+# vegan::mantel(dist_tools_df_dummy , exped_dummy_jacc)
+# 
+# vegan::mantel.partial(dist_tools_df_dummy, 
+#                       dist_technology_df_dummy,
+#                       exped_dummy_jacc,
+#                       permutations=1000)
+# 
+# vegan::mantel(dist_technology_df_dummy , exped_dummy_jacc)
+# vegan::mantel.partial(dist_technology_df_dummy,
+#                       dist_tools_df_dummy, 
+#                       exped_dummy_jacc,
+#                       permutations=1000)
 
 
 ##########
@@ -970,6 +909,7 @@ ecodist::mantel(as.dist(outlines_dist_matrix) ~ outlines_dist.geo,
 mantel_outlines
 mantel_outlines[1]^2
 
+# takes several hours!!!
 outlines_correlog <- vegan::mantel.correlog(D.eco = outlines_dist_matrix, 
                                          D.geo = outlines_dist.geo/1000,
                                          # XY=outlines_coord_matrix, 
@@ -977,12 +917,14 @@ outlines_correlog <- vegan::mantel.correlog(D.eco = outlines_dist_matrix,
                                            r.type="spearman", 
                                          nperm=1000,
                                          mult = "hochberg")
-outlines_correlog   
-plot(outlines_correlog)
+# saveRDS(outlines_correlog,
+#         file = file.path(output_path, "outlines_correlog.RDS"))
+# outlines_correlog   
+# plot(outlines_correlog)
 
 
-plot(x = as.vector(outlines_dist.geo)/1000,
-     y = as.vector(as.dist(outlines_dist_matrix)))
+# plot(x = as.vector(outlines_dist.geo)/1000,
+#      y = as.vector(as.dist(outlines_dist_matrix)))
 
 # outdist <- as.vector(as.dist(outlines_dist_matrix))
 # geodist <- as.vector(outlines_dist.geo)/1000
@@ -1012,12 +954,17 @@ mantel_res_df <- rbind.data.frame(tech_mantel_res_df,
 
 mantel_res_df$Significance <- sapply(mantel_res_df$`Pr(corrected)`, 
                                      function(x){
-                                       if(x <= 0.05){
+                                       if(x < 0.001){
+                                         "p<0.001"
+                                       } else if(x <= 0.05){
                                          "p≤0.05"
                                        } else { "n.s."}
                                      })
 mantel_res_df$Significance <- factor(mantel_res_df$Significance,
-                                     levels = c("p≤0.05", "n.s."))
+                                     levels = c("p<0.001", "p≤0.05", "n.s."))
+
+mantel_res_df$data <- factor(mantel_res_df$data,
+                             levels = c("Tools", "Technology", "Outlines"))
 
 
 
@@ -1026,7 +973,7 @@ mantel_plot <-
          aes(x = class.index,
              y = Mantel.cor)) +
   geom_point(size = 3, aes(shape = Significance)) +
-  scale_shape_manual(values=c(15,0)) +
+  scale_shape_manual(values=c(15,19,0)) +
   geom_line() +
   geom_hline(yintercept = 0, color = "red") +
   theme_bw() +
@@ -1036,15 +983,20 @@ mantel_plot <-
   scale_x_continuous(breaks = c(500,1000,1500,2000,2500)#labels = scales::comma
   ) +
   facet_wrap(~data,
-             ncol = 1)
+             ncol = 1,
+             scales = "free_y")
   # theme(legend.position =  c(0.9,0.9),
   #       legend.background = element_rect(fill="white",
   #                                        size=0.2, linetype="solid", 
   #                                        colour ="black"))
 mantel_plot
-ggsave(plot = mantel_plot,
-       filename = file.path(output_path, "mantel_plot.png"))
 
+ggsave(plot = mantel_plot,
+       filename = file.path(output_path, "Fig_8A_mantel_plot.png"),
+       width=20,height=15,units = "cm")
+svg(filename = file.path(output_path, "Fig_8A_mantel_plot.svg"),width = 20*0.39, height = 15*0.39)
+mantel_plot
+dev.off()
 
 
 ################################################
@@ -1134,9 +1086,10 @@ outlines_correlog_time <- vegan::mantel.correlog(D.eco = outlines_dist_matrix_ti
                                             # XY=outlines_coord_matrix, 
                                             cutoff=FALSE, 
                                             r.type="spearman", 
-                                            nperm=1000,
+                                            nperm=100,
                                             mult = "hochberg")
-
+saveRDS(outlines_correlog_time,
+        file = file.path(output_path, "outlines_correlog_time.RDS"))
 
 
 tech_mantel_time_res_df <- as.data.frame(technology_correlog_time$mantel.res)
@@ -1153,8 +1106,8 @@ mantel_time_res_df <- na.omit(rbind.data.frame(tech_mantel_time_res_df[,c(1:4,6)
 
 mantel_time_res_df$Significance <- sapply(mantel_time_res_df$`Pr(Mantel)`, 
                                      function(x){
-                                       if(x <= 0.001){
-                                         "p≤0.001"
+                                       if(x < 0.001){
+                                         "p<0.001"
                                        } else if(x <= 0.05){
                                          "p≤0.05"
                                        } else if(x >= 0.05){ 
@@ -1162,8 +1115,10 @@ mantel_time_res_df$Significance <- sapply(mantel_time_res_df$`Pr(Mantel)`,
                                          }
                                      })
 mantel_time_res_df$Significance <- factor(mantel_time_res_df$Significance,
-                                     levels = c("p≤0.05", "n.s."))
+                                     levels = c("p<0.001", "p≤0.05", "n.s."))
 
+mantel_time_res_df$data <- factor(mantel_time_res_df$data,
+                                  levels = c("Tools", "Technology", "Outlines"))
 
 library(ggplot2)
 mantel_time_plot <-
@@ -1171,7 +1126,7 @@ mantel_time_plot <-
          aes(x = class.index,
              y = Mantel.cor)) +
   geom_point(size = 3, aes(shape = Significance)) +
-  scale_shape_manual(values=c(15,0)) +
+  scale_shape_manual(values=c(15,19,0)) +
   geom_line() +
   geom_hline(yintercept = 0, color = "red") +
   theme_bw() +
@@ -1184,7 +1139,11 @@ mantel_time_plot <-
 mantel_time_plot
 
 ggsave(plot = mantel_time_plot,
-       filename = file.path(output_path, "mantel_time_plot.png"))
+       filename = file.path(output_path, "Fig_8B_mantel_time_plot.png"))
+
+svg(filename = file.path(output_path, "Fig_8B_mantel_time_plot.svg"),width = 20*0.39, height = 15*0.39)
+mantel_time_plot
+dev.off()
 
 
 
@@ -1197,23 +1156,21 @@ ggsave(plot = mantel_time_plot,
 
 
 
-
-
-fm1 <- lm(as.dist(outlines_dist_matrix_time) ~ outlines_dist.time)
-fm1
-summary(fm1)
-nlme::Variogram(resid(fm1), (outlines_dist.time))
-
-library(reshape2)
-N <- nrow(outlines_dist.time)
-melt(as.matrix(outlines_dist.time))
-
-df_dist <- data.frame(x=as.vector(outlines_dist_matrix_time),
-                      y=as.vector(outlines_dist.time))
-
-ggplot2::ggplot(data = df_dist) +
-  ggplot2::geom_point(ggplot2::aes(x=x,
-                                 y=y))
+# fm1 <- lm(as.dist(outlines_dist_matrix_time) ~ outlines_dist.time)
+# fm1
+# summary(fm1)
+# nlme::Variogram(resid(fm1), (outlines_dist.time))
+# 
+# library(reshape2)
+# N <- nrow(outlines_dist.time)
+# melt(as.matrix(outlines_dist.time))
+# 
+# df_dist <- data.frame(x=as.vector(outlines_dist_matrix_time),
+#                       y=as.vector(outlines_dist.time))
+# 
+# ggplot2::ggplot(data = df_dist) +
+#   ggplot2::geom_point(ggplot2::aes(x=x,
+#                                  y=y))
                 
      
      
