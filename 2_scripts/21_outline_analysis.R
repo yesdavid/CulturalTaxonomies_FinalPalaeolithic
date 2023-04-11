@@ -94,12 +94,12 @@ disparity_TSdiscrete_outlines_AR_ggplot_perTShard <-
 
 disparity_TSdiscrete_outlines_AR_ggplot_perTShard
 
-ggsave(filename = file.path(output_path, "Fig_10_outlines_AR_disparity_per_TS.png"),
+ggsave(filename = file.path(output_path, "Fig_9_outlines_AR_disparity_per_TS.png"),
        plot = disparity_TSdiscrete_outlines_AR_ggplot_perTShard,
        width = 7,
        height = 7)
 
-svg(filename=file.path(output_path , "Fig_10_outlines_AR_disparity_per_TS.svg"), width = 7, height = 7)
+svg(filename=file.path(output_path , "Fig_9_outlines_AR_disparity_per_TS.svg"), width = 7, height = 7)
 disparity_TSdiscrete_outlines_AR_ggplot_perTShard
 dev.off()
 
