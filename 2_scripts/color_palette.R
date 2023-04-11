@@ -37,3 +37,4 @@ data.frame(higher_order = c("Not classified",
 # TPC = "#0072B2", # TPC/TPC
 # Magdalenian = "#D55E00", # Magdalenian
 # Epigravettian = "#CC79A7" # Epigravettian)
+# "FALSE" = "grey96"
