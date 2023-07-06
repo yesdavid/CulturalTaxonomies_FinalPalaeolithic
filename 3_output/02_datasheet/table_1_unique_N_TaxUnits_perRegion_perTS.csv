@@ -1,0 +1,18 @@
+"Macroregion","I","II","III","IV","Unique_TaxUnits_per_Region"
+"SS","Havelte","Federmesser,Brommean","Brommean","Ahrensburgian,Maglemose",5
+"LT",,"Hamburgian,Federmesser","Federmesser,Brommean,Ahrensburgian","Swiderian",5
+"NG","Hamburgian,Federmesser,Federmesser/Brommean (?)","Federmesser,Havelte,Federmesser/Brommean(?),Brommean","Federmesser,Ahrensburgian","Maglemose",7
+"GBS","Creswellian/Late Magdalenian,Backed Blade/H-type CBP,Havelte","Backed Blade/H-type CBP,Havelte","Allerød CBP","Long Blade Industries/Epi-Ahrensburgian (FBT),Early Mesolithic",6
+"PL","Magdalenian,Hamburgian","Kamienna variant,Witowian","Witowian,Brommean,Perstunian,Wołkuszian","Wołkuszian,Epi-Ahrensburgian,Swiderian,Swiderian-Ahrensburgian,Płudian",11
+"BSN","Magdalenian","Federmesser","Epi-Ahrensburgian","Epi-Ahrensburgian",3
+"BOMO","Magdalenian","Magdalenian,Epimagdalenian,ABP Federmesser,ABP Tishnovian","ABP Tishnovian","Mesolithic",5
+"SG","Late/Transitional Magdalenian","Late Palaeolithic","Late Palaeolithic,Atzenhofer group","Late Palaeolithic,Atzenhofer group,Beuronian A",4
+"NF","Early Azilian,Upper Magdalenian","Early Azilian,Late Azilian","Late Azilian","Belloisian",4
+"ASH","Late Magdalenian,Late Epigravettian","Aziloid Alps,Aziloid - Tradition Eastern Central Europe","Aziloid Alps,Aziloid - Tradition Eastern Central Europe,Late Palaeolithic generic","Aziloid Alps,Epigravettiano recente,Aziloid - Tradition Eastern Central Europe,Late Palaeolithic generic",6
+"CH","Late Magdalenian/Technokomplex E,Older Azilian","Older Azilian,Fazies Fürsteiner","Older Azilian,Fazies Fürsteiner,Younger Azilian","Fazies Fürsteiner,Early Mesolithic I",5
+"NEI","Late Epigravettian (Phase 2)","Late Epigravettian (Phase 2),Late Epigravettian (Phase 3)","Late Epigravettian (Phase 3)","Late Epigravettian (Phase 4)/Early Sauveterrian,Early Sauveterrian (Phase 4)",4
+"SWF","Early Azilian,Upper Magdalenian","Early Azilian,Late Azilian","Early Laborian,Late Azilian","Early Laborian,Late Laborian",5
+"IBC","Final Magdalenian,Azilian","Azilian","Azilian","Azilian",2
+"IBM","Final Magdalenian,Upper Magdalenian","Epipaleolithic/Epimagdalenian","Sauveterrian/Sauveterroid Epipaleolithic,Epipaleolithic/Epimagdalenian","Sauveterrian/Sauveterroid Epipaleolithic",4
+"IBA","Upper Magdalenian","Final Magdalenian","Azilian","Azilian",3
+"Unique_TaxUnits_per_TS",17,24,23,26,

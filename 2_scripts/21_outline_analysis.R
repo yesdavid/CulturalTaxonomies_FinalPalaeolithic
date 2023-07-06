@@ -41,6 +41,10 @@ TS_boot <- boot.matrix(TS_subsets, bootstraps = 1000)
 TS_disp <- dispRity(TS_boot, metric = c(sum, variances))
 summary(TS_disp)
 
+readr::write_csv(summary(TS_disp),
+                 file = file.path(output_path, "outlines_AR_disparity_results.csv"))
+
+
 # Wilcox.test
 test.dispRity(TS_disp,
               test = wilcox.test,
