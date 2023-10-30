@@ -1,0 +1,41 @@
+
+install.packages("ape", repos="https://packagemanager.posit.co/cran/2023-03-13", dependencies=TRUE)
+install.packages("data.table", repos="https://packagemanager.posit.co/cran/2023-02-17", dependencies=TRUE)
+install.packages("dendextend", repos="https://packagemanager.posit.co/cran/2023-03-25", dependencies=TRUE)
+install.packages("dispRity", repos="https://packagemanager.posit.co/cran/2022-08-09", dependencies=TRUE)
+install.packages("dplyr", repos="https://packagemanager.posit.co/cran/2023-04-20", dependencies=TRUE)
+install.packages("dummies", repos="https://packagemanager.posit.co/cran/2012-06-14", dependencies=TRUE)
+install.packages("e1071", repos="https://packagemanager.posit.co/cran/2023-02-01", dependencies=TRUE)
+install.packages("ecodist", repos="https://packagemanager.posit.co/cran/2022-05-05", dependencies=TRUE)
+install.packages("forcats", repos="https://packagemanager.posit.co/cran/2023-01-29", dependencies=TRUE)
+install.packages("future", repos="https://packagemanager.posit.co/cran/2023-03-07", dependencies=TRUE)
+install.packages("future.apply", repos="https://packagemanager.posit.co/cran/2019-01-17", dependencies=TRUE)
+install.packages("geosphere", repos="https://packagemanager.posit.co/cran/2022-11-15", dependencies=TRUE)
+install.packages("ggplot2", repos="https://packagemanager.posit.co/cran/2023-08-14", dependencies=TRUE)
+
+install.packages("remotes")
+
+remotes::install_github(repo = "nevrome/ggpointgrid")
+
+install.packages("BiocManager", repos="https://packagemanager.posit.co/cran/2023-02-24", dependencies=TRUE)
+
+install.packages("magrittr", repos="https://packagemanager.posit.co/cran/2022-03-30", dependencies=TRUE)
+install.packages("mgcv", repos="https://packagemanager.posit.co/cran/2023-03-02", dependencies=TRUE)
+install.packages("Momocs", repos="https://packagemanager.posit.co/cran/2022-04-04", dependencies=TRUE)
+install.packages("nlme", repos="https://packagemanager.posit.co/cran/2023-01-31", dependencies=TRUE)
+install.packages("phangorn", repos="https://packagemanager.posit.co/cran/2023-01-23", dependencies=TRUE)
+install.packages("phytools", repos="https://packagemanager.posit.co/cran/2023-02-19", dependencies=TRUE)
+install.packages("randomcoloR", repos="https://packagemanager.posit.co/cran/2019-11-24", dependencies=TRUE)
+install.packages("raster", repos="https://packagemanager.posit.co/cran/2023-03-06", dependencies=TRUE)
+install.packages("readr", repos="https://packagemanager.posit.co/cran/2023-02-10", dependencies=TRUE)
+install.packages("reshape2", repos="https://packagemanager.posit.co/cran/2020-04-09", dependencies=TRUE)
+install.packages("rgeos", repos="https://packagemanager.posit.co/cran/2023-03-02", dependencies=TRUE)
+install.packages("rworldmap", repos="https://packagemanager.posit.co/cran/2016-02-03", dependencies=TRUE)
+install.packages("scales", repos="https://packagemanager.posit.co/cran/2022-08-20", dependencies=TRUE)
+install.packages("sp", repos="https://packagemanager.posit.co/cran/2023-01-19", dependencies=TRUE)
+install.packages("splitstackshape", repos="https://packagemanager.posit.co/cran/2019-04-21", dependencies=TRUE)
+install.packages("tictoc", repos="https://packagemanager.posit.co/cran/2023-04-23", dependencies=TRUE)
+install.packages("vegan", repos="https://packagemanager.posit.co/cran/2022-10-11", dependencies=TRUE)
+
+BiocManager::install("ggtree")
+
