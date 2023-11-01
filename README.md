@@ -28,6 +28,8 @@ This repository contains data (`1_data`) and code (`2_scripts`) for the paper. A
 ### Required R-packages and their versions:
 ape (>= 5.7-1), data.table (>= 1.14.8), dendextend (>= 1.17.1), dispRity (>= 1.7.0), dplyr (>= 1.1.2), dummies (>= 1.5.6), e1071 (>= 1.7-13), ecodist (>= 2.0.9), forcats (>= 1.0.0), future (>= 1.32.0), future.apply (>= 1.10.0), geosphere (>= 1.5-18), ggplot2 (>= 3.4.2), ggpointgrid (>= 1.2.0), ggtree (>= 3.6.2), magrittr (>= 2.0.3), mgcv (>= 1.8-42), Momocs (>= 1.4.0), nlme (>= 3.1-162), parallel (>= 4.3.1), phangorn (>= 2.11.1), phytools (>= 1.5-1), randomcoloR (>= 1.1.0.1), raster (>= 3.6-20), readr (>= 2.1.4), reshape2 (>= 1.4.4), rgeos (>= 0.6-2), rworldmap (>= 1.3-6), scales (>= 1.2.1), sp (>= 1.6-0), splitstackshape (>= 1.4.8), tictoc (>= 1.2), vegan (>= 2.6-4)
 
+These particular package versions can be downloaded and installed from the Posit Package Manager via the `install_packages.R` script provided in this repository. Alternatively, users can download and employ the `CultTaxFinalPal.sif` Singularity/Apptainer container provided on Zenodo ([https://doi.org/10.5281/zenodo.10061126](https://zenodo.org/doi/10.5281/zenodo.10061125)). To use the Singularity file interactively, use the following command: `singularity exec CultTaxFinalPal.sif R`. 
+
 ### Licenses:
 Code: MIT <http://opensource.org/licenses/MIT> year: 2023, copyright holder: David Nicolas Matzig
 
